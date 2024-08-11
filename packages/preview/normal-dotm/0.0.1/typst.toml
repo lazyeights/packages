@@ -1,0 +1,12 @@
+[package]
+name = "normal-dotm"
+version = "0.0.1"
+entrypoint = "lib.typ"
+authors = ["David Conrad <dconrad@gmail.com>"]
+license = "MIT-0"
+description = "A foundational template to replicate the classic normal.dotm template of MS Word with similar layout."
+
+[template]
+path = "template"
+entrypoint = "main.typ"
+thumbnail = "thumbnail.png"
