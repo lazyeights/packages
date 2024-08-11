@@ -35,6 +35,8 @@ case = (
   This `register_case` function does not, by itself insert a label into the document content. A
   separate call to `#toa_cases()` must be made somewhere.
 */
+// TODO: Allow overrride of 'display'
+// TODO: Allow entry of case via a dictionary
 #let register_case(
   key: none,
   display) = {
@@ -55,7 +57,7 @@ case = (
       citation: parsed_case.citation,
       parenthetical: parsed_case.parenthetical,
       short_cite: [#emph(parsed_case.short_title), #parsed_case.volume #parsed_case.reporter at ],
-      display: display,
+      display: auto,
     )
 
   cases.update(x => {
@@ -87,7 +89,7 @@ case = (
 }
 
 /*
-  display_case inserts an entry for the table of authorities.
+  display_case adds content for an entry in the table of authorities.
 
   TODO: insert link to pages
 */
@@ -122,10 +124,16 @@ case = (
 /*
   toa_cases inserts a complete table of authorities.
 */
-#let toa_cases() = context {
+#let toa_cases(uncited: true, labels: false) = context {
   for key in cases.final().keys() {
     let case = cases.final().at(key)
-    display_case(key)[#case.display #raw(lang: "typst", "<" + key + ">")]
+
+    // Auto-generate TOA entry from case components
+    if case.display == auto {
+      case.display = [#emph(case.title), \ #case.citation #case.parenthetical]
+    }
+
+    display_case(key, show_hidden: uncited)[#case.display #if labels { raw(lang: "typst", "<" + key + ">") }]
   }  
 }
 
@@ -185,10 +193,6 @@ case = (
     // Pincite is to regular reporter citation.
     return highlight[#link(target_label, cited_case.short_cite + supplement)#label("__citator:" + str(target_label))]
   }
-}
-
-#let short-cite(case) = {
-
 }
 
 #let citator-setup(body) = {
